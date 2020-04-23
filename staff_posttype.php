@@ -31,7 +31,7 @@ if( !defined( 'staff__posttype_PLUGIN_URL' ) ) 	define( 'staff__posttype_PLUGIN_
 
 
 function staff__posttype_scripts() {
-	wp_enqueue_style( 'penus', staff__posttype_PLUGIN_URL . 'includes/assets/styles/style.css', array(), '1.0.0' );
+	wp_enqueue_style( 'penus', staff__posttype_PLUGIN_URL . 'styles/style.css', array(), '1.0.0' );
 //	wp_enqueue_script( 'script-name', get_template_directory_uri() . '/js/example.js', array(), '1.0.0', true );
 }
 add_action( 'wp_enqueue_scripts', 'staff__posttype_scripts' );
@@ -176,16 +176,18 @@ function staff__posttype_template_chooser($template) {
 	// For all other CPT
 	if( get_post_type( $post_id ) != 'staff' ) {
 		return $template;
-	}
-	// Else use custom template
-	if ( is_archive() ) {
+	} else {
+		if ( is_archive() ) {
 //		staff__posttype_PLUGIN_URL . 'includes/templates/archive-staff.php';
-		return staff__posttype_get_template_hierarchy('archive-staff');
+			return staff__posttype_get_template_hierarchy('archive-staff');
+		}
+		elseif ( is_single() ) {
+			return staff__posttype_get_template_hierarchy('single-staff');
+		}
+		else {
+			return null;
+		}
 	}
-	if ( is_single() ) {
-		return staff__posttype_get_template_hierarchy('single-staff');
-	}
-
 }
 
 /**
