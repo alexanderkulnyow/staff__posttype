@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Меню сотрудников
  * Description: Описание плагина (140 символов)
- * Plugin URI:  Ссылка на инфо о плагине
+ * Plugin URI:  https://github.com/alexanderkulnyow/staff__posttype
  * Author URI:  Ссылка на автора
  * Author:      alexander kulnyow
  *
@@ -19,13 +19,44 @@
  * Version:     1.0
  */
 
+/*
+|--------------------------------------------------------------------------
+| CONSTANTS
+|--------------------------------------------------------------------------
+*/
 
-add_action( 'init', 'post_type_staff_register' );
-add_action( 'init', 'taxonomy_catstaff_register' );
-add_action( 'admin_init', 'add_custom_taxonomy' );
-//lab_assist
-//teacher
-function taxonomy_catstaff_register() {
+if( !defined( 'staff__posttype_BASE_FILE' ) )		define( 'staff__posttype_BASE_FILE', __FILE__ );
+if( !defined( 'staff__posttype_BASE_DIR' ) ) 		define( 'staff__posttype_BASE_DIR', dirname( staff__posttype_BASE_FILE ) );
+if( !defined( 'staff__posttype_PLUGIN_URL' ) ) 	define( 'staff__posttype_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+
+
+function staff__posttype_scripts() {
+	wp_enqueue_style( 'penus', staff__posttype_PLUGIN_URL . 'includes/assets/styles/style.css', array(), '1.0.0' );
+//	wp_enqueue_script( 'script-name', get_template_directory_uri() . '/js/example.js', array(), '1.0.0', true );
+}
+add_action( 'wp_enqueue_scripts', 'staff__posttype_scripts' );
+/*
+|--------------------------------------------------------------------------
+| FILTERS
+|--------------------------------------------------------------------------
+*/
+add_filter( 'init', 'post_type_staff_register' );
+add_filter( 'init', 'taxonomy_tax_staff_register' );
+add_filter( 'admin_init', 'add_custom_taxonomy' );
+add_filter( 'template_include', 'staff__posttype_template_chooser');
+/*
+|--------------------------------------------------------------------------
+| DEFINE THE CUSTOM TAXONOMY
+|--------------------------------------------------------------------------
+*/
+
+/**
+ * Setup staff Custom Taxonomy
+ *
+ * @since       1.0
+ */
+
+function taxonomy_tax_staff_register() {
 	register_taxonomy( 'tax_staff', array( 'staff' ), [
 		'label'             => '',
 		'labels'            => [
@@ -54,6 +85,45 @@ function taxonomy_catstaff_register() {
 	] );
 }
 
+/**
+ * Add staff Custom Taxonomy
+ *
+ * @since       1.0
+ */
+
+function add_custom_taxonomy() {
+	$cat_staff = array(
+//		'cat_ID'               => 897,
+		'cat_name'             => 'Преподавательский состав',
+		'category_description' => 'Преподавательский состав',
+		'category_nicename'    => 'teacher',
+		'category_parent'      => '',
+		'taxonomy'             => 'tax_staff'
+	);
+	wp_insert_category( $cat_staff );
+
+	$lab_assist = array(
+//		'cat_ID'               => 897,
+		'cat_name'             => 'Лаборантский состав',
+		'category_description' => 'Лаборантский состав',
+		'category_nicename'    => 'lab_assist',
+		'category_parent'      => '',
+		'taxonomy'             => 'tax_staff'
+	);
+	wp_insert_category( $lab_assist );
+
+}
+/*
+|--------------------------------------------------------------------------
+| DEFINE THE CUSTOM POST TYPE
+|--------------------------------------------------------------------------
+*/
+
+/**
+ * Setup staff Custom Post Type
+ *
+ * @since       1.0
+ */
 
 function post_type_staff_register() {
 	$labels = array(
@@ -86,25 +156,57 @@ function post_type_staff_register() {
 	register_post_type( 'staff', $args );
 }
 
-function add_custom_taxonomy() {
+/*
+|--------------------------------------------------------------------------
+| PLUGIN FUNCTIONS
+|--------------------------------------------------------------------------
+*/
 
-	$cat_staff = array(
-//		'cat_ID'               => 897,
-		'cat_name'             => 'Преподавательский состав',
-		'category_description' => 'Преподавательский состав',
-		'category_nicename'    => 'teacher',
-		'category_parent'      => '',
-		'taxonomy'             => 'tax_staff'
-	);
-	wp_insert_category( $cat_staff );
+/**
+ * Returns template file
+ *
+ * @since       1.0
+ */
 
-	$lab_assist = array(
-//		'cat_ID'               => 897,
-		'cat_name'             => 'Лаборантский состав',
-		'category_description' => 'Лаборантский состав',
-		'category_nicename'    => 'lab_assist',
-		'category_parent'      => '',
-		'taxonomy'             => 'tax_staff'
-	);
-	wp_insert_category( $lab_assist );
+function staff__posttype_template_chooser($template) {
+
+	// Post ID
+	$post_id = get_the_ID();
+
+	// For all other CPT
+	if( get_post_type( $post_id ) != 'staff' ) {
+		return $template;
+	}
+	// Else use custom template
+	if ( is_archive() ) {
+//		staff__posttype_PLUGIN_URL . 'includes/templates/archive-staff.php';
+		return staff__posttype_get_template_hierarchy('archive-staff');
+	}
+	if ( is_single() ) {
+		return staff__posttype_get_template_hierarchy('single-staff');
+	}
+
+}
+
+/**
+ * Get the custom template if is set
+ *
+ * @since       1.0
+ */
+
+function staff__posttype_get_template_hierarchy( $template ) {
+
+	// Get the template slug
+	$template_slug = rtrim($template, '.php');
+	$template      = $template_slug . '.php';
+
+	// Check if a custom template exists in the theme folder, if not, load the plugin template file
+	if ( $theme_file = locate_template(array('plugin_template/'.$template)) ) {
+		$file = $theme_file;
+	}
+	else {
+		$file = staff__posttype_BASE_DIR . '/includes/templates/' . $template;
+	}
+
+	return apply_filters( 'staff__posttype_repl_template_'.$template, $file);
 }
