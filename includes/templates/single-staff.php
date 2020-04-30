@@ -1,29 +1,22 @@
 <?php
 get_header();
 ?>
-<article id="post-<?php the_ID(); ?>" <?php post_class('list_post'); ?>>
-	<header class="entry-header">
-		<?php
-		if ( is_single() ) :
-//			the_title( '<h1 class="entry-title">', '</h1>' );
-		else :
-			the_title( '<h2 class="entry-title"><a href="' . esc_url( get_permalink() ) . '" rel="bookmark">', '</a></h2>' );
-		endif;
-//		?>
-	</header><!-- .entry-header -->
-	<div class="entry-content">
-		<?php
-		if ( has_post_thumbnail() ) {
-			the_post_thumbnail('small', array('class' => 'rounded-circle'));
-		}
-		else {
-			the_excerpt();
-		}
+<main class="container">
+	<?php
+	while ( have_posts() ) : the_post();
 
-		?>
-	</div><!-- .entry-content -->
-<!--	<footer class="entry-footer">-->
-    <a href="<?php echo get_permalink(); ?>"><button class="btn_readmore right"><?php echo esc_html__( 'Читать далее', 'theme_otip_vstu' )?></button></a>
-</article><!-- #post-## -->
+		get_template_part( 'template-parts/content_single', get_post_format() );
+
+//			the_post_navigation();
+//
+//			// If comments are open or we have at least one comment, load up the comment template.
+//			if ( comments_open() || get_comments_number() ) :
+//				comments_template();
+//			endif;
+
+	endwhile; // End of the loop.
+	?>
+</main>
+
 <?php
 get_footer();

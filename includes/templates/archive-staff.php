@@ -39,10 +39,15 @@ get_header();
 				} else {
 					foreach ( $posts as $post ) {
 						setup_postdata( $post );
-						echo '<div class="col-sm-6 col-md-4 card card_prepod">';
-						echo '<a href=" ' . get_permalink() . ' ">';
+						echo '<div class="col-sm-6 col-md-4">';
+						echo '<a class="card card_prepod" href=" ' . get_permalink() . ' ">';
 						if ( has_post_thumbnail() ) {
-							the_post_thumbnail( 'full', array( 'class' => 'img-fluid text-center mx-auto' ) );
+							$thumbnail_attr = array(
+								'class' => "img-fluid text-center mx-auto",
+								'alt'   => get_the_title(),
+								'altitlet'   => get_the_title()
+							);
+							the_post_thumbnail( 'Medium', $thumbnail_attr );
 						} else {
 							echo '<img class="mx-auto" src="https://placehold.it/200x200&text=NO_LOGO" alt=" ' . get_the_title() . ' ">';
 						}

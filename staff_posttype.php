@@ -169,10 +169,8 @@ function post_type_staff_register() {
  */
 
 function staff__posttype_template_chooser($template) {
-
 	// Post ID
 	$post_id = get_the_ID();
-
 	// For all other CPT
 	if( get_post_type( $post_id ) != 'staff' ) {
 		return $template;
