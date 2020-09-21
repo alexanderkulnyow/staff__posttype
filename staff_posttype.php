@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Меню сотрудников
- * Description: Описание плагина (140 символов)
+ * Description: Описание плагина (141 символов)
  * Plugin URI:  https://github.com/alexanderkulnyow/staff__posttype
  * Author URI:  Ссылка на автора
  * Author:      alexander kulnyow
@@ -88,6 +88,7 @@ function taxonomy_tax_staff_register() {
 		'description'       => '',
 		'public'            => true,
 		'hierarchical'      => true,
+		'has_archive'       => true,
 		'rewrite'           => true,
 		'capabilities'      => array( '' ),
 		'meta_box_cb'       => null,
@@ -105,7 +106,7 @@ function taxonomy_tax_staff_register() {
 
 function add_custom_taxonomy() {
 	$cat_staff = array(
-//		'cat_ID'               => 897,
+		'cat_ID'               => 897,
 		'cat_name'             => 'Преподавательский состав',
 		'category_description' => 'Преподавательский состав',
 		'category_nicename'    => 'teacher',
@@ -115,14 +116,23 @@ function add_custom_taxonomy() {
 	wp_insert_category( $cat_staff );
 
 	$lab_assist = array(
-//		'cat_ID'               => 897,
+		'cat_ID'               => 898,
 		'cat_name'             => 'Лаборантский состав',
 		'category_description' => 'Лаборантский состав',
 		'category_nicename'    => 'lab_assist',
-		'category_parent'      => '',
+		'category_parent'      => 'teacher',
 		'taxonomy'             => 'tax_staff'
 	);
 	wp_insert_category( $lab_assist );
+	$staff__parent = array(
+		'cat_ID'               => 899,
+		'cat_name'             => 'Сотрудники',
+		'category_description' => 'Сотрудники',
+		'category_nicename'    => 'staff',
+		'category_parent'      => '',
+		'taxonomy'             => 'tax_staff'
+	);
+	wp_insert_category( $staff__parent );
 
 }
 
