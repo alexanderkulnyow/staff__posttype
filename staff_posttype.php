@@ -42,20 +42,27 @@ if ( ! defined( 'staff__posttype_PLUGIN_URL' ) ) {
 |--------------------------------------------------------------------------
 */
 function staff__posttype_scripts() {
-	wp_enqueue_style( 'penus', staff__posttype_PLUGIN_URL . 'styles/style.css', array(), '1.0.0' );
-//	wp_enqueue_script( 'script-name', get_template_directory_uri() . '/js/example.js', array(), '1.0.0', true );
+	wp_enqueue_style( 'staff__postype-styles', staff__posttype_PLUGIN_URL . 'css/style.css', array( 'slick__theme__styles' ), '1.0.0' );
+	wp_enqueue_style( 'slick__styles', staff__posttype_PLUGIN_URL . 'vendors/slick/slick.css', array(), '1.8.1' );
+	wp_enqueue_style( 'slick__theme__styles', staff__posttype_PLUGIN_URL . 'vendors/slick/slick.css', array( 'slick__styles' ), '1.8.1' );
+	wp_enqueue_script( 'slick__js', staff__posttype_PLUGIN_URL . 'vendors/slick/slick.js', array( 'jquery' ), '1.8.1', true );
+	wp_enqueue_script( 'staff__postype__js', staff__posttype_PLUGIN_URL . 'js/main.js', array( 'slick__js' ), '1.0.0', true );
 }
 
-add_action( 'wp_enqueue_scripts', 'staff__posttype_scripts' );
+
 /*
 |--------------------------------------------------------------------------
-| FILTERS
+| FILTERS & ACTIONS
 |--------------------------------------------------------------------------
 */
 add_filter( 'init', 'post_type_staff_register' );
 add_filter( 'init', 'taxonomy_tax_staff_register' );
 add_filter( 'admin_init', 'add_custom_taxonomy' );
 add_filter( 'template_include', 'staff__posttype_template_chooser' );
+
+add_action( 'wp_enqueue_scripts', 'staff__posttype_scripts' );
+
+add_shortcode( 'staff_slick', 'staff_slick_func' );
 /*
 |--------------------------------------------------------------------------
 | DEFINE THE CUSTOM TAXONOMY
@@ -230,3 +237,47 @@ function staff__posttype_get_template_hierarchy( $template ) {
 
 	return apply_filters( 'staff__posttype_repl_template_' . $template, $file );
 }
+
+function staff_slick_func( $atts ) {
+	?>
+    <section class="container-fluid d-none d-md-block prepodback">
+        <h2>Преподавательский состав</h2>
+        <div class="1row">
+            <div class="row">
+                <div class="staff">
+					<?php
+					$args = array(
+						'post_type' => 'staff'
+					);
+
+					$posts = get_posts( $args );
+					foreach ( $posts as $post ) {
+						setup_postdata( $post ); ?>
+                        <div class=" col-4">
+                            <a href=" <?php echo esc_url( get_permalink() ); ?>">
+								<?php the_post_thumbnail( 'thumbnail', array( 'class' => ' rounded-circle center-block center-block' ) ); ?>
+                                <h4 class="text-center mt-2" itemprop="name"> <?php echo get_the_title(); ?></h4>
+                            </a>
+                            <div class="mt-3">
+								<?php get_the_excerpt(); ?>
+                            </div>
+                        </div>
+						<?php
+					}
+					wp_reset_postdata();
+					?>
+                </div>
+
+            </div>
+        </div>
+        <div class="text-center">
+            <a href="<?php echo get_permalink(); ?>">
+                <button class="btn_staff" type="button">Сотрудники</button>
+            </a>
+        </div>
+		<?php wp_reset_postdata(); ?>
+    </section>
+	<?php
+}
+
+
